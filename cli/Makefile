@@ -9,8 +9,8 @@ include $(JULIAHOME)/deps/llvm-ver.make
 HEADERS := $(addprefix $(JULIAHOME)/src/,julia.h julia_assert.h julia_threads.h julia_internal.h options.h) \
 	$(BUILDDIR)/../src/julia_version.h $(wildcard $(JULIAHOME)/src/support/*.h) $(LIBUV_INC)/uv.h
 
-LOADER_CFLAGS := $(JCFLAGS) -I$(BUILDROOT)/src -I$(JULIAHOME)/src -I$(JULIAHOME)/src/support -I$(build_includedir)
-LOADER_LDFLAGS :=
+LOADER_CFLAGS = $(JCFLAGS) -I$(BUILDROOT)/src -I$(JULIAHOME)/src -I$(JULIAHOME)/src/support -I$(build_includedir)
+LOADER_LDFLAGS = $(JLDFLAGS)
 
 ifeq ($(OS),WINNT)
 LOADER_CFLAGS += -municode -mconsole -ffreestanding -nostdlib \
