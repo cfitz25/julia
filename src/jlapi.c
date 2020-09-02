@@ -493,6 +493,7 @@ static int exec_program(char *program)
     }
     JL_CATCH {
         jl_value_t *errs = jl_stderr_obj();
+        JL_GC_PUSH1(&errs);
         volatile int shown_err = 0;
         jl_printf(JL_STDERR, "error during bootstrap:\n");
         JL_TRY {
@@ -507,6 +508,7 @@ static int exec_program(char *program)
         }
         JL_CATCH {
         }
+        JL_GC_POP();
         if (!shown_err) {
             jl_static_show(JL_STDERR, jl_current_exception());
             jl_printf(JL_STDERR, "\n");
@@ -575,6 +577,7 @@ static NOINLINE int true_main(int argc, char *argv[])
             ios_flush(ios_stdout);
             line = ios_readline(ios_stdin);
             jl_value_t *val = (jl_value_t*)jl_eval_string(line);
+            JL_GC_PUSH1(&val);
             if (jl_exception_occurred()) {
                 jl_printf(JL_STDERR, "error during run:\n");
                 jl_static_show(JL_STDERR, jl_exception_occurred());
@@ -583,6 +586,7 @@ static NOINLINE int true_main(int argc, char *argv[])
             else if (val) {
                 jl_static_show(JL_STDOUT, val);
             }
+            JL_GC_POP();
             jl_printf(JL_STDOUT, "\n");
             free(line);
             line = NULL;
