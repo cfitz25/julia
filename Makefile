@@ -416,8 +416,6 @@ endif
 
 ifneq ($(LOADER_BUILD_DEP_LIBS),$(LOADER_INSTALL_DEP_LIBS))
 	# Next, overwrite relative path to libjulia in our loaders if $(LOADER_BUILD_DEP_LIBS) != $(LOADER_INSTALL_DEP_LIBS)
-	echo LOADER_BUILD_DEP_LIBS=$(LOADER_BUILD_DEP_LIBS)
-	echo LOADER_INSTALL_DEP_LIBS=$(LOADER_INSTALL_DEP_LIBS)
 	$(call stringreplace,$(DESTDIR)$(bindir)/julia,$(LOADER_BUILD_DEP_LIBS)$$,$(LOADER_INSTALL_DEP_LIBS))
 	$(call stringreplace,$(DESTDIR)$(shlibdir)/libjulialoader.$(JL_MAJOR_MINOR_SHLIB_EXT),$(LOADER_BUILD_DEP_LIBS)$$,$(LOADER_INSTALL_DEP_LIBS))
 
