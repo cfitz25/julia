@@ -7034,7 +7034,11 @@ static std::pair<std::unique_ptr<Module>, jl_llvm_functions_t>
     // link the dependent llvmcall modules, but switch their function's linkage to private
     // so that they don't show up in the execution engine.
     for (auto &Mod : ctx.llvmcall_modules) {
+#if JL_LLVM_VERSION >= 110000
+        SmallVector<llvm::StringRef, 1> Exports;
+#else
         SmallVector<std::string, 1> Exports;
+#endif
         for (const auto &F: Mod->functions())
             if (!F.isDeclaration())
                 Exports.push_back(F.getName());
