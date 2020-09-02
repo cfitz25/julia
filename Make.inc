@@ -1494,7 +1494,7 @@ LIBGCC_NAME := libgcc_s.$(SHLIB_EXT).1
 endif
 
 LIBGCC_BUILD_DEPLIB := $(call dep_lib_path,$(build_bindir),$(build_shlibdir)/$(LIBGCC_NAME))
-LIBGCC_INSTALL_DEPLIB := $(call dep_lib_path,$(bindir),$(shlibdir)/$(LIBGCC_NAME))
+LIBGCC_INSTALL_DEPLIB := $(call dep_lib_path,$(bindir),$(private_shlibdir)/$(LIBGCC_NAME))
 
 # We only list libjulia and libgcc_s for now.  libgcc_s because FreeBSD needs to load ours,
 # not the system one.  Note that libjulia must always come last.
