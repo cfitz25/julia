@@ -114,8 +114,8 @@ const char * get_exe_dir()
 #elif defined(_OS_FREEBSD_)
     // On FreeBSD, we use the KERN_PROC_PATHNAME sysctl:
     int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
-    int exe_dir_len = PATH_MAX - 1;
-    int ret = sysctl(mib, 4, exe_dir, &exe_dir_len, NULL, 0);
+    unsigned long exe_dir_len = PATH_MAX - 1;
+    int ret = sysctl(mib, 4, &exe_dir, &exe_dir_len, NULL, 0);
     if (ret) {
         print_stderr("ERROR: sysctl(KERN_PROC_PATHNAME) failed\n");
         exit(1);
