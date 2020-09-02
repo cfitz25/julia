@@ -1479,11 +1479,29 @@ LIBJULIA_INSTALL_DEPLIB := $(call dep_lib_path,$(bindir),$(shlibdir)/libjulia.$(
 LIBJULIA_DEBUG_BUILD_DEPLIB := $(call dep_lib_path,$(build_bindir),$(build_shlibdir)/libjulia-debug.$(JL_MAJOR_MINOR_SHLIB_EXT))
 LIBJULIA_DEBUG_INSTALL_DEPLIB := $(call dep_lib_path,$(bindir),$(shlibdir)/libjulia-debug.$(JL_MAJOR_MINOR_SHLIB_EXT))
 
-# Eventually, we'll need to build actual lists, but until then
-LOADER_BUILD_DEP_LIBS = $(LIBJULIA_BUILD_DEPLIB)
-LOADER_DEBUG_BUILD_DEP_LIBS = $(LIBJULIA_DEBUG_BUILD_DEPLIB)
-LOADER_INSTALL_DEP_LIBS = $(LIBJULIA_INSTALL_DEPLIB)
-LOADER_DEBUG_INSTALL_DEP_LIBS = $(LIBJULIA_DEBUG_INSTALL_DEPLIB)
+ifeq ($(OS),WINNT)
+ifeq ($(BINARY),32)
+LIBGCC_NAME := libgcc_s_sjlj-1.$(SHLIB_EXT)
+else
+LIBGCC_NAME := libgcc_s_seh-1.$(SHLIB_EXT)
+endif
+endif
+ifeq ($(OS),Darwin)
+LIBGCC_NAME := libgcc_s.1.$(SHLIB_EXT)
+endif
+ifneq ($(findstring $(OS),Linux FreeBSD),)
+LIBGCC_NAME := libgcc_s.$(SHLIB_EXT).1
+endif
+
+LIBGCC_BUILD_DEPLIB := $(call dep_lib_path,$(build_bindir),$(build_shlibdir)/$(LIBGCC_NAME))
+LIBGCC_INSTALL_DEPLIB := $(call dep_lib_path,$(bindir),$(shlibdir)/$(LIBGCC_NAME))
+
+# We only list libjulia and libgcc_s for now.  libgcc_s because FreeBSD needs to load ours,
+# not the system one.  Note that libjulia must always come last.
+LOADER_BUILD_DEP_LIBS = $(LIBGCC_BUILD_DEPLIB):$(LIBJULIA_BUILD_DEPLIB)
+LOADER_DEBUG_BUILD_DEP_LIBS = $(LIBGCC_BUILD_DEPLIB):$(LIBJULIA_DEBUG_BUILD_DEPLIB)
+LOADER_INSTALL_DEP_LIBS = $(LIBGCC_INSTALL_DEPLIB):$(LIBJULIA_INSTALL_DEPLIB)
+LOADER_DEBUG_INSTALL_DEP_LIBS = $(LIBGCC_INSTALL_DEPLIB):$(LIBJULIA_DEBUG_INSTALL_DEPLIB)
 
 # Colors for make
 ifndef VERBOSE
