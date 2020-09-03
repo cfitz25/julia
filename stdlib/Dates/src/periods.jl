@@ -473,6 +473,8 @@ Base.hash(x::Month, h::UInt) = hash(value(x), h + otherperiod_seed)
 Base.isless(x::FixedPeriod, y::OtherPeriod) = throw(MethodError(isless, (x, y)))
 Base.isless(x::OtherPeriod, y::FixedPeriod) = throw(MethodError(isless, (x, y)))
 
+Base.isless(x::Period, y::CompoundPeriod) = Base.isless(CompoundPeriod(x),y)
+Base.isless(x::CompoundPeriod, y::Period) = Base.isless(x,CompoundPeriod(y))
 function Base.isless(x::CompoundPeriod, y::CompoundPeriod)
     x_sum_min = 0
     x_sum_max = 0
@@ -486,6 +488,9 @@ function Base.isless(x::CompoundPeriod, y::CompoundPeriod)
         elseif(t == Month)
             x_sum_min += tons(Day(29))*p.value
             x_sum_max += tons(Day(31))*p.value
+        elseif(t == Quarter)
+            x_sum_min += tons(Day(90))*p.value
+            x_sum_max += tons(Day(92))*p.value
         else
             x_sum_min += tons(p)
             x_sum_max += tons(p)
@@ -499,6 +504,9 @@ function Base.isless(x::CompoundPeriod, y::CompoundPeriod)
         elseif(t == Month)
             y_sum_min += tons(Day(29))*p.value
             y_sum_max += tons(Day(31))*p.value
+        elseif(t == Quarter)
+            y_sum_min += tons(Day(90))*p.value
+            y_sum_max += tons(Day(92))*p.value
         else
             y_sum_min += tons(p)
             y_sum_max += tons(p)
@@ -513,13 +521,12 @@ function Base.isless(x::CompoundPeriod, y::CompoundPeriod)
         x_sum_min < y_sum_max)
         )
     if(sum_val == 0)
-        return 0
+        return false
     end
     if(sum_val == 4)
-        return 1
+        return true
     end
-    #bad value should throw error
-    return 2
+    throw(InexactError(:isless, Dates.CompoundPeriod,"Total FixedPeriod values are within error margin of total OtherPeriods"))
 end
 # truncating conversions to milliseconds, nanoseconds and days:
 # overflow can happen for periods longer than ~300,000 years
