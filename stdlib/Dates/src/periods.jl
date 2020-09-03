@@ -512,8 +512,6 @@ function Base.isless(x::CompoundPeriod, y::CompoundPeriod)
             y_sum_max += tons(p)
         end 
     end
-    # println((x_sum_min,x_sum_max,y_sum_min,y_sum_max))
-    # println((x_sum_max < y_sum_min, x_sum_min < y_sum_min, x_sum_max < y_sum_max,x_sum_min < y_sum_max))
     sum_val = sum(
         (x_sum_max < y_sum_min, 
         x_sum_min < y_sum_min, 
