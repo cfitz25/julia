@@ -473,6 +473,54 @@ Base.hash(x::Month, h::UInt) = hash(value(x), h + otherperiod_seed)
 Base.isless(x::FixedPeriod, y::OtherPeriod) = throw(MethodError(isless, (x, y)))
 Base.isless(x::OtherPeriod, y::FixedPeriod) = throw(MethodError(isless, (x, y)))
 
+function Base.isless(x::CompoundPeriod, y::CompoundPeriod)
+    x_sum_min = 0
+    x_sum_max = 0
+    y_sum_min = 0
+    y_sum_max = 0
+    for p in x.periods
+        t = typeof(p)
+        if(t == Year)
+            x_sum_min += tons(Day(365))*p.value
+            x_sum_max += tons(Day(366))*p.value
+        elseif(t == Month)
+            x_sum_min += tons(Day(29))*p.value
+            x_sum_max += tons(Day(31))*p.value
+        else
+            x_sum_min += tons(p)
+            x_sum_max += tons(p)
+        end 
+    end
+    for p in y.periods
+        t = typeof(p)
+        if(t == Year)
+            y_sum_min += tons(Day(365))*p.value
+            y_sum_max += tons(Day(366))*p.value
+        elseif(t == Month)
+            y_sum_min += tons(Day(29))*p.value
+            y_sum_max += tons(Day(31))*p.value
+        else
+            y_sum_min += tons(p)
+            y_sum_max += tons(p)
+        end 
+    end
+    # println((x_sum_min,x_sum_max,y_sum_min,y_sum_max))
+    # println((x_sum_max < y_sum_min, x_sum_min < y_sum_min, x_sum_max < y_sum_max,x_sum_min < y_sum_max))
+    sum_val = sum(
+        (x_sum_max < y_sum_min, 
+        x_sum_min < y_sum_min, 
+        x_sum_max < y_sum_max,
+        x_sum_min < y_sum_max)
+        )
+    if(sum_val == 0)
+        return 0
+    end
+    if(sum_val == 4)
+        return 1
+    end
+    #bad value should throw error
+    return 2
+end
 # truncating conversions to milliseconds, nanoseconds and days:
 # overflow can happen for periods longer than ~300,000 years
 toms(c::Nanosecond)  = div(value(c), 1000000)
